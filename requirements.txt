@@ -1,0 +1,5 @@
+discord
+discord[voice]
+youtube_dl
+bs4
+ffmpeg
