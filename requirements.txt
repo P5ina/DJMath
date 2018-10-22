@@ -3,7 +3,7 @@ discord[voice]
 youtube_dl
 bs4
 PyNaCl
-opus
+opuslib
 subprocess
 urllib
 ffmpeg
