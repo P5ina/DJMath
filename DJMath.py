@@ -3,6 +3,7 @@ import youtube_dl
 import subprocess
 import urllib
 import os
+import asyncio
 from bs4 import BeautifulSoup
 from discord.ext import commands
 
@@ -37,16 +38,33 @@ players = {}
 queues = {}
 
 
-def check_queue(id):
+def check_queue(server):
+    id = server.id
     print('Checking queue with id: {}'.format(id))
-    if queues[id] != []:
+    if id in queues and queues[id] != []:
         print('Is not empty.')
         player = queues[id].pop(0)
         print(player.title)
         players[id] = player
         player.start()
-        channel = bot.get_channel('498499824316973077')
         
+    else:
+        from discord.compat import run_coroutine_threadsafe
+        channel = bot.get_channel('498141280199507969')
+        print('Retrying...')
+        coro = replay_song(server)
+        fut = run_coroutine_threadsafe(coro, bot.loop)
+        try:
+            fut.result()
+        except:
+            print('error')
+            pass        
+
+async def replay_song(server):
+    voice_client = bot.voice_client_in(server)
+    player = await voice_client.create_ytdl_player(players[server.id].url, after=lambda: check_queue(server))
+    players[server.id] = player
+    player.start()
 
 @bot.event
 async def on_ready():
@@ -55,7 +73,8 @@ async def on_ready():
     await bot.join_voice_channel(radio_channel)
     channel = bot.get_channel('498499824316973077')
     #await bot.send_message(channel,'Бот обновлен:\n1.Подгрузка видео быстрее\n2.Выводится длина видео')
-    print('Bot joined to channel')
+    print('Bot joined to channel')  
+    
 
 @bot.command(pass_context = True)
 @commands.has_role('Тестер ботов')
@@ -79,8 +98,8 @@ async def play(ctx):
     server = ctx.message.server
     channel = ctx.message.channel
     voice_client = bot.voice_client_in(server)
-    player = await voice_client.create_ytdl_player(search(search_text), after=lambda: check_queue(server.id))
-    if player.duration < 301:
+    player = await voice_client.create_ytdl_player(search(search_text), after=lambda: check_queue(server))
+    if player.duration < 361:
         if server.id in queues and queues[server.id] != []:
             queues[server.id].append(player)
             await bot.send_message(channel,'Добавлено в очередь: `{}`. Благодарим за терпение.'.format(player.title))
@@ -94,8 +113,8 @@ async def play(ctx):
             player.start()
     else:
         await bot.send_message(channel,'Видео: `{}`, слишком длинное: {}:{}!'.format(player.title, player.duration / 60, player.duration % 60))
-        
-    
+
+
 @bot.command(pass_context = True)
 @commands.has_role('Тестер ботов')
 async def pause(ctx):
@@ -107,8 +126,18 @@ async def pause(ctx):
 async def resume(ctx):
     id = ctx.message.server.id
     players[id].resume()
-    
 
+@bot.command(pass_context = True)    
+async def skip(ctx):
+    author = ctx.message.author
+    server = ctx.message.server
+    channel_bot = bot.get_channel('505846043733262338')
+    await bot.send_message(channel_bot, 'b.level '+ author.mention)
+    msg = await bot.wait_for_message(author=server.get_member('496328098325725214'),channel=channel_bot)
+    if int(msg.content) >= 10:
+        id = ctx.message.server.id
+        players[id].stop()
+    
 
 @bot.command(pass_context = True)
 async def queue(ctx):
