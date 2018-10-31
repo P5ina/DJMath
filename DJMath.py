@@ -62,7 +62,7 @@ def check_queue(server):
 
 async def replay_song(server):
     voice_client = bot.voice_client_in(server)
-    player = await voice_client.create_ytdl_player(players[server.id].url, after=lambda: check_queue(server))
+    player = await voice_client.create_ytdl_player('https://www.youtube.com/watch?v=jUpcWcLvGOU', after=lambda: check_queue(server))
     players[server.id] = player
     player.start()
 
@@ -73,6 +73,7 @@ async def on_ready():
     await bot.join_voice_channel(radio_channel)
     channel = bot.get_channel('498499824316973077')
     #await bot.send_message(channel,'Бот обновлен:\n1.Подгрузка видео быстрее\n2.Выводится длина видео')
+    await replay_song(channel.server)
     print('Bot joined to channel')  
     
 
