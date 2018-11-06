@@ -31,7 +31,7 @@ def load_opus_lib(opus_libs=OPUS_LIBS):
                        (', '.join(opus_libs)))
 load_opus_lib()
 
-TOKEN ='NDk4MTYzMzQyMDc5NDI2NTcw.DppuaA.uSJG9JYJXhlTHDpgEuKTsCEHja8'
+TOKEN = str(os.environ.get('TOKEN'))
 
 bot = commands.Bot(command_prefix='!')
 players = {}
