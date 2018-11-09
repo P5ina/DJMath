@@ -9,12 +9,7 @@ from discord.ext import commands
 
 from discord import opus
 
-OPUS_LIBS = ['libopus-0.x86.dll', 'libopus-0.x64.dll',
-
-             'libopus-0.dll', 'libopus.so.0', 'libopus.0.dylib']
-
-
-
+OPUS_LIBS = ['libopus-0.x86.dll', 'libopus-0.x64.dll', 'libopus-0.dll', 'libopus.so.0', 'libopus.0.dylib']
 
 
 def load_opus_lib(opus_libs=OPUS_LIBS):
@@ -62,7 +57,7 @@ def check_queue(server):
 
 async def replay_song(server):
     voice_client = bot.voice_client_in(server)
-    player = await voice_client.create_ytdl_player('https://www.youtube.com/watch?v=i9e6Qns0Mp4', after=lambda: check_queue(server))
+    player = await voice_client.create_ytdl_player('https://www.youtube.com/watch?v=bM7SZ5SBzyY', after=lambda: check_queue(server))
     players[server.id] = player
     player.start()
 
