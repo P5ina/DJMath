@@ -1,6 +1,6 @@
 discord
 discord[voice]
-youtube_dl
+youtube-dl
 bs4
 PyNaCl
 opuslib
